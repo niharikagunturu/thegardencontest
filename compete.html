@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+  <title>Game</title>
+  <style>
+    :root {
+      --cell-size: calc(3.5vw);
+    }
+ 
+ html { height: 100%; };
+ body { min-height: 100%; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(var(--grid-size), 0.04fr);
+      grid-gap: calc(var(--cell-size) * 0.001);
+	  justify-content: center;
+	  <!-- border: 1px solid #28984d; -->
+	  
+    }
+    
+    .cell {
+	  width: var(--cell-size);
+      height: var(--cell-size);
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      cursor: pointer;
+    }
+	#notificationBar {
+            width: 90%;
+            border: 1px solid #ddd;
+            padding: 1px 1px;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+			background-color:#f8f9fa;
+            align-items: center;
+        }
+	#notificationBar1 {
+            width: 50%;
+            border: 1px solid #ddd;
+            padding: 1px 1px;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+			background-color:#f8f9fa;
+            align-items: center;
+        }
+    #daffodilCount {
+      margin-top: 10px;
+    }
+    
+    #tulipCount {
+      margin-top: 10px;
+    }
+
+    #squirrelsDown {
+      margin-top: 10px;
+    }
+
+    #cost {
+      margin-top: 10px;
+    }
+
+    #points {
+      margin-top: 10px;
+    }
+
+    #nextLevelButton {
+      margin-top: 10px;
+    }
+	
+    #resetButton {
+      margin-top: 10px;
+    }
+    #entryPage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    #trainButton {
+      padding: 10px 20px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    #competeButton {
+      padding: 10px 20px;
+      font-size: 18px;
+	  
+      cursor: pointer;
+	  text-decoration: none;
+    }
+	.notification-icon {
+            width: 40px;
+            height:40px;
+        }
+		
+		/* The Modal (background) */
+	.modal {
+	  display: none; /* Hidden by default */
+	  position: fixed; /* Stay in place */
+	  z-index: 1; /* Sit on top */
+	  padding-top: 100px; /* Location of the box */
+	  left: 0;
+	  top: 0;
+	  width: 100%; /* Full width */
+	  height: 100%; /* Full height */
+	  overflow: auto; /* Enable scroll if needed */
+	  background-color: rgb(0,0,0); /* Fallback color */
+	  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+	}
+
+	/* Modal Content */
+	.modal-content {
+	  background-color: #fefefe;
+	  margin: auto;
+	  padding: 20px;
+	  border: 1px solid #888;
+	  width: 80%;
+	}
+
+	/* The Close Button */
+	.close {
+	  color: #aaaaaa;
+	  float: right;
+	  font-size: 28px;
+	  font-weight: bold;
+	}
+
+	.close:hover,
+	.close:focus {
+	  color: #000;
+	  text-decoration: none;
+	  cursor: pointer;
+	}
+
+	body {
+	  font-family: "Trebuchet MS", "Arial", sans-serif;
+	}
+  #levelTitle {
+    font-size: 20px;
+  }	
+  .responsive-image {
+    max-width: 80%;
+    height: auto;
+  }  
+  </style>
+</head>
+<body>
+
+  <div class="container" align ="center">
+  <div id="entryPage">
+    <h1> The Garden Contest </h1>
+	<img src="banner.png" alt="Banner Image" class="responsive-image">	
+	<div class="row">
+	<br>
+    <div class ="col-sm-6"><button id="trainButton" class="btn btn-primary btn-md "> GO! </button></div>
+</div>
+ 
+  </div>
+
+  <div id="gamePage" style="display: none; justify-content:center">
+ <h1 class="text-center"> The Garden Contest</h1>
+  <div class="row">
+ 
+  <div class ="col-sm-2"> </div>
+  	<div class ="col-sm-8"> 
+	   
+		<!-- <div id="points"></div> -->
+	</div>
+	<div id="levelSubtitle" >Use the budget to come up with a garden of your choice! You can optimize for most points generated or most squirrels remaining or whatever you'd like!</div>
+  <div class ="col-sm-2"> <span class="badge bg-success">Budget: $700</div>
+  
+   </div>
+    <div class="grid" id="grid"></div>
+	<br>
+    <div id ="notificationBar">
+		 <!-- <div id="daffodilCount"></div>  -->
+		 <!-- <div id="tulipCount"></div>  -->
+		 <div id="cost"></div>
+		 <div id="points"></div>
+		<div id="squirrelsDown"></div>
+	</div>
+
+	<!-- <div id ="notificationBar1" > -->
+	    <!-- <div id="cost"></div> -->
+		<!-- <div id="points"></div> -->
+	<!-- </div> -->
+    <button id="resetButton" class="btn btn-info" > Reset </button>
+    <button id="nextLevelButton"  class="btn btn-success" disabled>Double Click to Submit </button>
+	<div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2 id ="finalnote"> </h2>
+	<div class="row">
+    <div class ="col-sm-4"><button id="competeButton" class="btn btn-primary btn-md" onclick="location.href='compete.html'" type="button"> Compete again? </button></div>
+	</div>
+  </div>
+
+</div>
+  </div>
+  <br>
+    <div id="notificationBar" style="width: 90%;">
+ 			<div><img class="notification-icon d-icon" src="daffodil.png" alt="D Icon">  <div id ="daffodil"> To Plant, Click Tile Once <br> Cost:$10 <br> Points: 4</div></div> 	
+ 			<div><img class="notification-icon d-icon" src="sdaff.png" alt="D Icon">  <div id ="daffodil"> Daffodil coexists w Squirrel <br> Cost:$10 <br> Points: 4</div></div> 		
+    </div>
+  <br>
+    <div id="notificationBar" style="width: 90%;">
+            <div><img class="notification-icon t-icon" src="tulip.png" alt="T Icon"> <div id ="tulip"> To Plant, Click Tile Twice <br> Cost:$5 <br> Points: 8</div> </div>			
+            <div><img class="notification-icon t-icon" src="stulip.png" alt="T Icon"> <div id ="tulip"> Purge Squirrel to plant Tulip <br> Cost:$5 <br> Points: 8</div> </div>			
+    </div>	
+</div>
+  <script>
+    const grassImage = "grass.png";
+    const squirrelImage = "squirrel.png";
+    const tulipImage = "tulip.png";
+    const daffodilImage = "daffodil.png";
+    const stulipImage = "stulip.png";
+    const sdaffImage = "sdaff.png";
+
+    let daffodilCount = 0;
+    let tulipCount = 0;
+    let squirrels_down = 0;
+    let cost = 0;
+    let points = 0;
+    let currentLevel = 1;
+
+    const levels = [
+       {
+        gridSize: 10,
+        squirrels: 70,
+        //levelTitle: "Contest Level",
+        //levelSubtitle: "Use the budget to come up with a garden of your choice! You can optimize for most points generated or most squirrels remaining or whatever you'd like!",
+        budget: 700,
+        cutoff: 110,
+        extinction: 70
+      }
+    ];
+
+    function createGrid(n, s) {
+      const gridContainer = document.getElementById("grid");
+      gridContainer.innerHTML = "";
+
+      gridContainer.style.setProperty('--grid-size', n);
+
+      const totalCells = n * n;
+      const squirrelIndices = getRandomIndices(totalCells, s);
+      const cells = [];
+
+      for (let i = 0; i < totalCells; i++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.clickCount = 0;
+        gridContainer.appendChild(cell);
+        cells.push(cell);
+
+        if (squirrelIndices.includes(i)) {
+          cell.style.backgroundImage = `url('${squirrelImage}')`;
+          cell.addEventListener("click", function() {
+            handleClick(cell, "squirrel");
+          });
+        } else {
+          cell.style.backgroundImage = `url('${grassImage}')`;
+          cell.addEventListener("click", function() {
+            handleClick(cell, "grass");
+          });
+        }
+      }
+
+      updateDisplayedQuantities();
+    }
+
+    function handleClick(cell, type) {
+      cell.clickCount++;
+
+      if (type === "grass") {
+        if (cell.clickCount === 1) {
+          cell.style.backgroundImage = `url('${daffodilImage}')`;
+          daffodilCount++;
+        } else if (cell.clickCount === 2) {
+          cell.style.backgroundImage = `url('${tulipImage}')`;
+          daffodilCount--;
+          tulipCount++;
+        } else if (cell.clickCount === 3) {
+          cell.style.backgroundImage = `url('${grassImage}')`;
+          tulipCount--;
+          cell.clickCount = 0;
+        }
+      } else if (type === "squirrel") {
+        if (cell.clickCount === 1) {
+          cell.style.backgroundImage = `url('${sdaffImage}')`;
+          daffodilCount++;
+        } else if (cell.clickCount === 2) {
+          cell.style.backgroundImage = `url('${stulipImage}')`;
+          daffodilCount--;
+          tulipCount++;
+          squirrels_down++;
+        } else if (cell.clickCount === 3) {
+          cell.style.backgroundImage = `url('${squirrelImage}')`;
+          tulipCount--;
+          squirrels_down--;
+          cell.clickCount = 0;
+        }
+      }
+
+      updateDisplayedQuantities();
+    }
+
+    function updateDisplayedQuantities() {
+      const daffodilCountElement = document.getElementById("daffodilCount");
+      //daffodilCountElement.textContent = `Daffodils: ${daffodilCount}`;
+
+      const tulipCountElement = document.getElementById("tulipCount");
+     // tulipCountElement.textContent = `Tulips: ${tulipCount}`;
+
+      const squirrelsDownElement = document.getElementById("squirrelsDown");
+      squirrelsDownElement.textContent = `Squirrels Remaining: ${getCurrentLevel().squirrels-squirrels_down}`;
+
+      cost = 10 * daffodilCount + 5 * tulipCount;
+      const costElement = document.getElementById("cost");
+      costElement.textContent = `Cost: ${cost}`;
+
+      points = 4 * daffodilCount + 8 * tulipCount;
+      const pointsElement = document.getElementById("points");
+      pointsElement.textContent = `Points: ${points}`;
+
+      const nextLevelButton = document.getElementById("nextLevelButton");
+      nextLevelButton.disabled = !(cost <= 700  );
+
+      //const levelTitleElement = document.getElementById("levelTitle");
+      //levelTitleElement.textContent = getCurrentLevel().levelTitle;
+
+      //const levelSubtitleElement = document.getElementById("levelSubtitle");
+      //levelSubtitleElement.textContent = getCurrentLevel().levelSubtitle;
+    }
+
+    function getCurrentLevel() {
+      return levels[currentLevel - 1];
+	  //return 5;
+    }
+
+    function proceedToNextLevel() {
+	  
+		//daffodilCount = 0;
+        //tulipCount = 0;
+        //squirrels_down = 0;
+        //cost = 0;
+        //points = 0;
+		console.log(currentLevel);
+		updateDisplayedQuantities();
+		//createGrid(getCurrentLevel().gridSize, getCurrentLevel().squirrels);
+				
+				var modal = document.getElementById("myModal");
+				var btn = document.getElementById("nextLevelButton");	
+				var span = document.getElementsByClassName("close")[0];
+				console.log(currentLevel);
+				btn.onclick = function() {
+				  modal.style.display = "block";
+				}
+				span.onclick = function() {
+				  modal.style.display = "none";
+				}
+				window.onclick = function(event) {
+				  if (event.target == modal) {
+					modal.style.display = "none";
+				  }
+				}
+	  var squirrels_rem = 70-squirrels_down;
+	  const finalNoteElement = document.getElementById("finalnote");
+      finalNoteElement.textContent = `Congrats!! Your solution earned ${points} points with ${squirrels_rem} squirrels remaining.Thanks for participating and be sure to collect the Reflections sheet before you leave! `;
+      
+
+    }
+
+    function resetGrid() {
+      daffodilCount = 0;
+      tulipCount = 0;
+      squirrels_down = 0;
+      cost = 0;
+      points = 0;
+      updateDisplayedQuantities();
+      createGrid(getCurrentLevel().gridSize, getCurrentLevel().squirrels);
+    }
+
+    function getRandomIndices(totalCells, s) {
+      const indices = [];
+      while (indices.length < s) {
+        const randomIndex = Math.floor(Math.random() * totalCells);
+        if (!indices.includes(randomIndex)) {
+          indices.push(randomIndex);
+        }
+      }
+      return indices;
+    }
+
+    document.getElementById("resetButton").addEventListener("click", resetGrid); 
+    document.getElementById("nextLevelButton").addEventListener("click", proceedToNextLevel);
+
+    function startGame() {
+      document.getElementById("entryPage").style.display = "none";
+      document.getElementById("gamePage").style.display = "block";
+      resetGrid();
+    }
+
+    document.getElementById("trainButton").addEventListener("click", startGame);
+	
+  </script>
+</body>
+</html>
